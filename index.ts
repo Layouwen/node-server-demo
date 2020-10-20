@@ -2,13 +2,16 @@ import * as http from "http";
 import {IncomingMessage, ServerResponse} from "http";
 import * as fs from "fs";
 import * as p from "path";
+import * as url from 'url'
 
 const server = http.createServer();
 const publicDir = p.resolve(__dirname, 'public');
 
 server.on('request', (request: IncomingMessage, response: ServerResponse) => {
-  const {method, url, headers} = request;
-  switch (url) {
+  const {method, url: path, headers} = request;
+  const {pathname, search} = url.parse(path)
+  console.log(111,search)
+  switch (pathname) {
     case '/index':
       fs.readFile(p.resolve(publicDir, 'index.html'), (error, data) => {
         if (error) throw error;
@@ -30,6 +33,7 @@ server.on('request', (request: IncomingMessage, response: ServerResponse) => {
       });
       break;
     default:
+      response.statusCode = 404
       response.end();
   }
 });
